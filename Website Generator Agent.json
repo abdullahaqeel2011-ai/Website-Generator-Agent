@@ -1,0 +1,255 @@
+{
+  "name": "Website Generator Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "websiteType",
+              "value": "Portfolio",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "websiteName",
+              "value": "AI Automation",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "primaryColor",
+              "value": "#3B82F6",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "sections",
+              "value": "hero, about, projects, contact",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b34d3ab1-38fc-4e59-987f-02abef559a8d",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.websiteName }}\nType: {{ $json.websiteType }}\nSections: {{ $json.sections }}\nPrimary Color: {{ $json.primaryColor }}",
+        "options": {
+          "systemMessage": "You are an expert web developer and designer specializing in creating modern, responsive personal websites.\n\nYour task is to:\n1. Analyze the website requirements provided (name, type, sections, colors)\n2. Use the HTML Generator Tool to create semantic, accessible HTML structure\n3. Use the CSS Generator Tool to create modern, responsive CSS styling\n4. Return the complete website code\n\nGuidelines:\n- Create clean, semantic HTML5 markup\n- Use modern CSS with flexbox/grid for layouts\n- Ensure mobile responsiveness\n- Include smooth animations and transitions\n- Follow accessibility best practices\n- Use the provided color scheme\n\nReturn ONLY the final combined HTML and CSS code."
+        }
+      },
+      "id": "6e5e1d92-e607-4238-9e5c-d38f210bce97",
+      "name": "Website Generator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1560,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "description": "Generates semantic HTML5 structure for websites based on requirements",
+        "jsCode": "// Get website requirements from AI\nconst websiteName = $fromAI('website_name', 'The name of the website', 'string');\nconst websiteType = $fromAI('website_type', 'The type of website (e.g., portfolio, blog, business)', 'string');\nconst sections = $fromAI('sections', 'Comma-separated list of sections to include', 'string');\nconst primaryColor = $fromAI('primary_color', 'Primary color for the website (hex code)', 'string');\n\n// Parse sections\nconst sectionList = sections.split(',').map(s => s.trim());\n\n// Generate HTML structure\nlet html = `<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>${websiteName}</title>\n</head>\n<body>\n  <header>\n    <nav>\n      <h1>${websiteName}</h1>\n      <ul class=\"nav-links\">\n`;\n\n// Add navigation links for each section\nsectionList.forEach(section => {\n  html += `        <li><a href=\"#${section}\">${section.charAt(0).toUpperCase() + section.slice(1)}</a></li>\\n`;\n});\n\nhtml += `      </ul>\n    </nav>\n  </header>\n  <main>\n`;\n\n// Generate sections\nsectionList.forEach(section => {\n  const sectionName = section.charAt(0).toUpperCase() + section.slice(1);\n  \n  if (section === 'hero') {\n    html += `    <section id=\"${section}\" class=\"hero\">\n      <h2>Welcome to ${websiteName}</h2>\n      <p>Your ${websiteType} showcase</p>\n    </section>\\n`;\n  } else if (section === 'about') {\n    html += `    <section id=\"${section}\" class=\"about\">\n      <h2>About</h2>\n      <p>Information about this ${websiteType}</p>\n    </section>\\n`;\n  } else if (section === 'projects') {\n    html += `    <section id=\"${section}\" class=\"projects\">\n      <h2>Projects</h2>\n      <div class=\"project-grid\">\n        <div class=\"project-card\">\n          <h3>Project 1</h3>\n          <p>Project description</p>\n        </div>\n        <div class=\"project-card\">\n          <h3>Project 2</h3>\n          <p>Project description</p>\n        </div>\n      </div>\n    </section>\\n`;\n  } else if (section === 'contact') {\n    html += `    <section id=\"${section}\" class=\"contact\">\n      <h2>Contact</h2>\n      <form>\n        <input type=\"text\" placeholder=\"Name\" required>\n        <input type=\"email\" placeholder=\"Email\" required>\n        <textarea placeholder=\"Message\" required></textarea>\n        <button type=\"submit\">Send</button>\n      </form>\n    </section>\\n`;\n  } else {\n    html += `    <section id=\"${section}\" class=\"${section}\">\n      <h2>${sectionName}</h2>\n      <p>Content for ${sectionName} section</p>\n    </section>\\n`;\n  }\n});\n\nhtml += `  </main>\n  <footer>\n    <p>&copy; 2024 ${websiteName}. All rights reserved.</p>\n  </footer>\n</body>\n</html>`;\n\nreturn html;"
+      },
+      "id": "68e6531b-3996-4359-9575-997f3c09ac4e",
+      "name": "HTML Generator Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "description": "Generates modern responsive CSS styling for websites",
+        "jsCode": "// Generate modern responsive CSS based on design preferences\nconst websiteType = $fromAI('website_type', 'Type of website (e.g., portfolio, blog, business)', 'string', 'portfolio');\nconst primaryColor = $fromAI('primary_color', 'Primary color for the website (hex code)', 'string', '#3B82F6');\nconst sections = $fromAI('sections', 'Comma-separated list of sections', 'string', 'hero, about, projects, contact');\n\n// Generate CSS based on the design preferences\nconst css = `\n/* Reset and Base Styles */\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nbody {\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n  line-height: 1.6;\n  color: #333;\n  background-color: #ffffff;\n}\n\n/* Container */\n.container {\n  max-width: 1200px;\n  margin: 0 auto;\n  padding: 0 20px;\n}\n\n/* Header and Navigation */\nheader {\n  background-color: ${primaryColor};\n  color: white;\n  padding: 1rem 0;\n  position: sticky;\n  top: 0;\n  z-index: 100;\n  box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n}\n\nnav ul {\n  list-style: none;\n  display: flex;\n  justify-content: center;\n  gap: 2rem;\n}\n\nnav a {\n  color: white;\n  text-decoration: none;\n  font-weight: 500;\n  transition: opacity 0.3s ease;\n}\n\nnav a:hover {\n  opacity: 0.8;\n}\n\n/* Sections */\nsection {\n  padding: 4rem 0;\n  min-height: 400px;\n}\n\nsection:nth-child(even) {\n  background-color: #f8f9fa;\n}\n\nh1, h2, h3 {\n  margin-bottom: 1rem;\n  color: ${primaryColor};\n}\n\nh1 {\n  font-size: 3rem;\n  font-weight: 700;\n}\n\nh2 {\n  font-size: 2.5rem;\n  font-weight: 600;\n  text-align: center;\n  margin-bottom: 2rem;\n}\n\n/* Hero Section */\n.hero {\n  text-align: center;\n  padding: 6rem 0;\n  background: linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%);\n  color: white;\n}\n\n.hero h1 {\n  color: white;\n  margin-bottom: 1.5rem;\n}\n\n/* Grid Layouts */\n.grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\n  gap: 2rem;\n  margin-top: 2rem;\n}\n\n.card {\n  background: white;\n  padding: 2rem;\n  border-radius: 8px;\n  box-shadow: 0 4px 6px rgba(0,0,0,0.1);\n  transition: transform 0.3s ease, box-shadow 0.3s ease;\n}\n\n.card:hover {\n  transform: translateY(-5px);\n  box-shadow: 0 8px 12px rgba(0,0,0,0.15);\n}\n\n/* Buttons */\n.btn {\n  display: inline-block;\n  padding: 0.75rem 1.5rem;\n  background-color: ${primaryColor};\n  color: white;\n  text-decoration: none;\n  border-radius: 5px;\n  transition: background-color 0.3s ease;\n  border: none;\n  cursor: pointer;\n  font-size: 1rem;\n}\n\n.btn:hover {\n  background-color: ${primaryColor}dd;\n}\n\n/* Footer */\nfooter {\n  background-color: #333;\n  color: white;\n  text-align: center;\n  padding: 2rem 0;\n  margin-top: 4rem;\n}\n\n/* Responsive Design */\n@media (max-width: 768px) {\n  h1 {\n    font-size: 2rem;\n  }\n  \n  h2 {\n    font-size: 1.75rem;\n  }\n  \n  nav ul {\n    flex-direction: column;\n    gap: 1rem;\n  }\n  \n  .grid {\n    grid-template-columns: 1fr;\n  }\n  \n  section {\n    padding: 2rem 0;\n  }\n}\n\n/* Animations */\n@keyframes fadeIn {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n\n.fade-in {\n  animation: fadeIn 0.6s ease-out;\n}\n`;\n\nreturn css;"
+      },
+      "id": "5dcb7eee-1202-4beb-b0b9-bb2cfd40975a",
+      "name": "CSS Generator Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        1888,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the agent output\nconst agentOutput = $input.all()[0].json.output;\n\n// Extract HTML and CSS from the agent's response\n// The agent should have used the tools to generate HTML and CSS\nlet html = '';\nlet css = '';\n\n// Try to parse the agent output to extract HTML and CSS\nif (typeof agentOutput === 'string') {\n  // Look for HTML content (between <html> tags or <!DOCTYPE>)\n  const htmlMatch = agentOutput.match(/<!DOCTYPE[\\s\\S]*?<\\/html>|<html[\\s\\S]*?<\\/html>/i);\n  if (htmlMatch) {\n    html = htmlMatch[0];\n  }\n  \n  // Look for CSS content (between <style> tags or standalone CSS)\n  const styleMatch = agentOutput.match(/<style[^>]*>([\\s\\S]*?)<\\/style>/i);\n  if (styleMatch) {\n    css = styleMatch[1];\n  } else {\n    // Try to find CSS blocks\n    const cssMatch = agentOutput.match(/\\/\\*[\\s\\S]*?\\*\\/|[^{}]+\\{[^{}]*\\}/g);\n    if (cssMatch) {\n      css = cssMatch.join('\\n');\n    }\n  }\n}\n\n// If HTML already contains CSS, use it as is\nif (html && html.includes('<style>')) {\n  return [{\n    json: {\n      websiteCode: html,\n      hasEmbeddedCSS: true\n    }\n  }];\n}\n\n// Otherwise, combine HTML and CSS\nif (html && css) {\n  // Insert CSS into the HTML head\n  const headEndIndex = html.indexOf('</head>');\n  if (headEndIndex !== -1) {\n    const combinedHTML = html.slice(0, headEndIndex) + \n      `\\n  <style>\\n${css}\\n  </style>\\n` + \n      html.slice(headEndIndex);\n    \n    return [{\n      json: {\n        websiteCode: combinedHTML,\n        hasEmbeddedCSS: true\n      }\n    }];\n  }\n}\n\n// Fallback: return the agent output as is\nreturn [{\n  json: {\n    websiteCode: agentOutput || 'No website code generated',\n    hasEmbeddedCSS: false\n  }\n}];"
+      },
+      "id": "359d8c76-6473-407f-83da-1534c85dfbe2",
+      "name": "Combine HTML & CSS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        656
+      ],
+      "id": "ae76f6cd-6cb5-4381-b469-017a30bbdb30",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "guIE10sibTk2FlHd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "website",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d7f257aa-e30a-4e59-8426-67b79a3591ab",
+      "name": "Website URL",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        432
+      ],
+      "webhookId": "626d563f-b957-489d-bfb7-61eb3ff4c7d7"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.websiteCode }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html"
+              }
+            ]
+          }
+        }
+      },
+      "id": "968d4be5-7f8b-49f6-814b-e75139410a6d",
+      "name": "Display Website",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2192,
+        432
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Website Generator Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Generator Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Website Generator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSS Generator Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Website Generator Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website Generator Agent": {
+      "main": [
+        [
+          {
+            "node": "Combine HTML & CSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine HTML & CSS": {
+      "main": [
+        [
+          {
+            "node": "Display Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Website Generator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website URL": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "aedc6166-82b1-42b7-a300-3533a0503cd4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b380b8ff1680d7ec51d9edad3de4deb7250b8279b40099a1087d84c412ad8352"
+  },
+  "id": "Va6J50L0vPxn60Iu",
+  "tags": []
+}
